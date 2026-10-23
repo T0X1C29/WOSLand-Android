@@ -1,0 +1,17 @@
+name: Bug report
+description: Report a reproducible deployment-tooling problem
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the command, output, and expected behavior. Remove secrets and private identifiers.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Android version, architecture, Termux source, Debian version, and Python version.
+    validations:
+      required: true

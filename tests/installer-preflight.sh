@@ -7,6 +7,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir "$tmp/app" "$tmp/wheels"
 printf '%s\n' 'example-package==0.0.0' > "$tmp/app/requirements.txt"
+touch "$tmp/wheels/.placeholder"
 
 if WOSLAND_APP_DIR="$tmp/app" WOSLAND_WHEELHOUSE="$tmp/wheels" WOSLAND_PYTHON=python3 \
   sh "$ROOT/scripts/install-offline.sh" >/dev/null 2>&1; then

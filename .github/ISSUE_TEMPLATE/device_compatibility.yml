@@ -1,0 +1,10 @@
+name: Device compatibility report
+description: Share a tested device result using the community template
+body:
+  - type: textarea
+    id: report
+    attributes:
+      label: Report
+      description: Complete docs/community-device-test.md. Do not include credentials, databases, or private server identifiers.
+    validations:
+      required: true
