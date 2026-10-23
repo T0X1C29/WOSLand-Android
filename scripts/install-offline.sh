@@ -5,9 +5,13 @@ APP=${WOSLAND_APP_DIR:-/root/python-wosland}
 WHEELHOUSE=${1:-${WOSLAND_WHEELHOUSE:-/root/wheelhouse}}
 PYTHON=${WOSLAND_PYTHON:-python3.13}
 
+test -f /etc/debian_version || { echo 'Run this inside Debian, not directly in Termux.' >&2; exit 1; }
+test "$(uname -s)" = Linux || { echo 'Linux is required.' >&2; exit 1; }
 command -v "$PYTHON" >/dev/null 2>&1 || { echo "Missing $PYTHON; choose a compatible Python first." >&2; exit 1; }
 test -f "$APP/requirements.txt" || { echo "Missing $APP/requirements.txt" >&2; exit 1; }
 test -d "$WHEELHOUSE" || { echo "Missing wheelhouse: $WHEELHOUSE" >&2; exit 1; }
+find "$WHEELHOUSE" -maxdepth 1 -type f | grep -q . || { echo "Wheelhouse is empty: $WHEELHOUSE" >&2; exit 1; }
+command -v ldd >/dev/null 2>&1 || { echo 'Missing ldd; cannot verify glibc.' >&2; exit 1; }
 
 "$PYTHON" - <<'PY'
 import platform, sys
@@ -19,7 +23,6 @@ if platform.machine() not in ('aarch64', 'arm64'):
     raise SystemExit('This verified wheelhouse targets Linux ARM64; stop instead of guessing.')
 PY
 
-mkdir -p "$APP/.venv313"
 if [ ! -x "$APP/.venv313/bin/python" ]; then
   "$PYTHON" -m venv "$APP/.venv313"
 fi

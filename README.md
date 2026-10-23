@@ -87,6 +87,10 @@ sh scripts/install-offline.sh
 sh scripts/install-check.sh
 ```
 
+Run these helpers inside the Debian proot container, not directly in Termux.
+They stop on non-Linux, non-ARM64, or non-CPython-3.13 environments rather
+than silently using incompatible wheels.
+
 The Dell is optional for normal hosting. It is useful when the phone cannot
 resolve PyPI or when ARM64 wheels must be downloaded once and transferred over
 ADB. No wheelhouse or virtual environment belongs in this repository.
@@ -106,10 +110,14 @@ admins, gift codes, redemption history, ID channels, and change history.
 
 ## Watchdog and boot
 
-Use one supervisor only. The tested deployment uses a foreground Debian-proot
-launch, a 15-second restart delay, a duplicate-instance lock, and a Termux:Boot
-launcher with a bounded delay. Keep disabled service directories outside runit’s
-watch directory. A real Android reboot is required before claiming reboot
+Use one supervisor only. The watchdog runs in Termux and enters Debian with
+`proot-distro login`; it does not execute Debian paths as Termux paths. Install
+it as `$HOME/.local/bin/wosland-watchdog` and install the boot template under
+`$HOME/.termux/boot/`. Configure `WOSLAND_CONTAINER`, `WOSLAND_APP_DIR`,
+`WOSLAND_PYTHON`, and `WOSLAND_STATE_DIR` for the device. Defaults are
+`wosland-test`, `/root/python-wosland`, and a Termux state directory. The
+watchdog uses a PID-backed lock, a 15-second restart delay, bounded logs, and a
+stop marker. A real Android reboot is required before claiming reboot
 persistence.
 
 ## Backup and restore

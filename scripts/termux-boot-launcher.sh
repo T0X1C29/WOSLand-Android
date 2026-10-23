@@ -1,4 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/sh
-sleep 30
-exec "$HOME/wosland-python-watchdog.sh"
+set -eu
+sleep "${WOSLAND_BOOT_DELAY:-30}"
+exec "$HOME/.local/bin/wosland-watchdog"
 
