@@ -6,6 +6,23 @@ The upstream source remains the source of truth and is not redistributed here.
 Upstream: https://github.com/whiteout-project/bot
 Validated release: v2.1.3, commit `e7a453088575b4cd00affca307fb3c9814f9e763`.
 
+Maintainer: **T0X1C/JOSH**. This repository is an Android deployment companion,
+not a replacement for or claim of ownership of the official WOSLand software.
+
+## What this project provides
+
+It documents how to host the complete upstream Python bot on a rooted Android
+phone using Termux and Debian ARM64 proot. It includes conservative device
+detection, ARM64 offline-install helpers, watchdog and boot templates, backup
+guidance, and community test forms. It does not contain the upstream source,
+tokens, databases, or personal server configuration.
+
+The upstream bot supports gift-code management and redemption, players and
+alliances, attendance and OCR screenshot processing, bear tracking, minister
+appointments, notifications, interactive panels, themes, backups, and multiple
+guild configuration. The Moto installation loaded all official modules, but not
+every member workflow was individually exercised.
+
 ## License and attribution
 
 Read and comply with the upstream `LICENSE` before redistribution or changes.
@@ -26,6 +43,22 @@ or private server configuration.
 | Discord startup | authenticated and slash commands synced |
 | Watchdog | one process tree, 15-second backoff |
 
+Other architectures are detected but deliberately not described as supported.
+See [architecture policy](docs/ARCHITECTURES.md) and the
+[community test template](docs/community-device-test.md).
+
+## Device check
+
+From Termux, run the read-only compatibility report before installing:
+
+```sh
+sh scripts/compatibility-check.sh
+```
+
+It reports Android/API level, architecture, RAM, storage, root visibility,
+Termux, and proot-distro availability. It never changes the device. ARM64 is
+the only architecture with the complete native dependency path verified here.
+
 ## Installation outline
 
 Install Termux and Termux:Boot from trusted sources, create a dedicated Debian
@@ -44,6 +77,19 @@ every wheel matches CPython 3.13 and ARM64. Install Debian `libgl1` and
 `libglib2.0-0` for OpenCV/RapidOCR. Store the token outside Git with owner-only
 permissions. Validate modules, OCR, database integrity, command sync, and
 resources before enabling one watchdog and the Termux:Boot launcher.
+
+The reusable offline helper is intentionally fail-closed:
+
+```sh
+WOSLAND_APP_DIR=/root/python-wosland \
+WOSLAND_WHEELHOUSE=/root/wheelhouse \
+sh scripts/install-offline.sh
+sh scripts/install-check.sh
+```
+
+The Dell is optional for normal hosting. It is useful when the phone cannot
+resolve PyPI or when ARM64 wheels must be downloaded once and transferred over
+ADB. No wheelhouse or virtual environment belongs in this repository.
 
 Example verification commands inside Debian:
 
