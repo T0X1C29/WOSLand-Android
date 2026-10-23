@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ROOT=$(cd -- "$(dirname -- "$0")/.." && pwd)
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
 for script in "$ROOT"/scripts/*.sh; do

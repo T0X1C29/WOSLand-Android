@@ -1,5 +1,7 @@
 # WOSLand on Android (Termux + Debian proot)
 
+[![Android validation](https://github.com/T0X1C29/WOSLand-Android/actions/workflows/android-validation.yml/badge.svg)](https://github.com/T0X1C29/WOSLand-Android/actions/workflows/android-validation.yml)
+
 Reusable deployment notes for the official Python Whiteout Survival Discord Bot.
 The upstream source remains the source of truth and is not redistributed here.
 

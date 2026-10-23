@@ -1,0 +1,103 @@
+name: Android validation
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shell-syntax:
+    name: Shell syntax
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate POSIX shell syntax
+        run: |
+          set -eu
+          for file in scripts/*.sh tests/*.sh; do
+            sh -n "$file"
+          done
+      - name: Validate Bash syntax where applicable
+        run: |
+          set -eu
+          for file in scripts/*.sh tests/*.sh; do
+            if head -n 1 "$file" | grep -q bash; then bash -n "$file"; fi
+          done
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run pinned ShellCheck
+        run: docker run --rm -v "$PWD:/mnt" koalaman/shellcheck-alpine:v0.10.0 sh -c 'shellcheck -x /mnt/scripts/*.sh /mnt/tests/*.sh'
+
+  posix-tests:
+    name: POSIX and simulation tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run test harness
+        run: |
+          set -eu
+          sh tests/shell-tests.sh
+          sh tests/android-simulation.sh
+          sh tests/installer-preflight.sh
+          sh tests/watchdog-simulation.sh
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo '## Validation summary'
+            echo '- Shell syntax: passed'
+            echo '- Android simulation: passed'
+            echo '- Installer preflight: passed'
+            echo '- Watchdog simulation: passed'
+            echo '- Skipped: physical Android, Discord, OCR inference, and live APIs'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  dependency-policy:
+    name: Dependency and source policy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify pinned upstream metadata
+        run: |
+          set -eu
+          grep -F 'e7a453088575b4cd00affca307fb3c9814f9e763' scripts/fetch-upstream.sh
+          grep -F 'CPython 3.13' README.md docs/CI-TESTING.md
+          grep -F 'onnxruntime' scripts/install-check.sh
+          grep -F 'rapidocr' scripts/install-check.sh
+          grep -F 'numpy' scripts/install-check.sh
+          grep -F 'matplotlib' scripts/install-check.sh
+
+  security:
+    name: Security and privacy scan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check tracked files and secret patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked=$(git ls-files)
+          if printf '%s\n' "$tracked" | grep -E '(^|/)(private-backups|.*\.(db|sqlite|tar\.gz|key|pem))$'; then
+            echo 'Sensitive file is tracked.' >&2
+            exit 1
+          fi
+          if git grep -n -I -E 'DISCORD_TOKEN=|ghp_[A-Za-z0-9]+|github_pat_[A-Za-z0-9_]+|BEGIN [A-Z ]+ PRIVATE KEY|C:\\Users\\Joshua' -- . ':!config/example.env' | grep -v 'DISCORD_TOKEN=replace-me'; then
+            echo 'Possible secret or personal path detected.' >&2
+            exit 1
+          fi
+          echo 'Security scan passed.' >> "$GITHUB_STEP_SUMMARY"
