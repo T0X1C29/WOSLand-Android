@@ -116,9 +116,9 @@ it as `$HOME/.local/bin/wosland-watchdog` and install the boot template under
 `$HOME/.termux/boot/`. Configure `WOSLAND_CONTAINER`, `WOSLAND_APP_DIR`,
 `WOSLAND_PYTHON`, and `WOSLAND_STATE_DIR` for the device. Defaults are
 `wosland-test`, `/root/python-wosland`, and a Termux state directory. The
-watchdog uses a PID-backed lock, a 15-second restart delay, bounded logs, and a
-stop marker. A real Android reboot is required before claiming reboot
-persistence.
+watchdog uses a PID-backed lock, a 15-second restart delay, bounded logs, and
+`$HOME/.wosland-python.stop` as its default stop marker. A real Android reboot
+is required before claiming reboot persistence.
 
 ## Backup and restore
 

@@ -13,4 +13,6 @@ grep -q '/etc/debian_version' "$ROOT/scripts/install-offline.sh" || fail 'offlin
 grep -q '/etc/debian_version' "$ROOT/scripts/install-check.sh" || fail 'import checker must require Debian'
 grep -q 'su -c' "$ROOT/scripts/compatibility-check.sh" && fail 'checker must not invoke su automatically'
 grep -q 'WOSLAND_APP_DIR' "$ROOT/scripts/install-offline.sh" || fail 'app path must be configurable'
+grep -q 'on_term' "$ROOT/scripts/termux-watchdog.sh" || fail 'watchdog must exit on termination'
+grep -q 'WOSLAND_STOP_MARKER' "$ROOT/scripts/termux-watchdog.sh" || fail 'stop marker must be configurable'
 echo 'PASS: shell syntax and safety checks'

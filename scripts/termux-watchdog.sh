@@ -8,6 +8,7 @@ APP=${WOSLAND_APP_DIR:-/root/python-wosland}
 PYTHON=${WOSLAND_PYTHON:-$APP/.venv313/bin/python}
 START_CMD=${WOSLAND_START_CMD:-"$PYTHON main.py --no-venv"}
 STATE=${WOSLAND_STATE_DIR:-$HOME/.local/var/wosland}
+STOP=${WOSLAND_STOP_MARKER:-$HOME/.wosland-python.stop}
 LOG="$STATE/watchdog.log"
 LOCK="$STATE/watchdog.lock"
 PIDFILE="$LOCK/pid"
@@ -24,18 +25,20 @@ fi
 mkdir "$LOCK"
 printf '%s\n' "$$" > "$PIDFILE"
 cleanup() { rm -rf "$LOCK"; }
-trap cleanup EXIT INT TERM
+on_term() { cleanup; exit 143; }
+trap cleanup EXIT
+trap on_term INT TERM
 
 proot-distro login "$CONTAINER" -- sh -c "test -d '$APP' && test -x '$PYTHON'" \
   || { echo "Debian app or Python not found: $CONTAINER:$APP" >&2; exit 1; }
 
-[ -e "$STATE/stop" ] && exit 0
+[ -e "$STOP" ] && exit 0
 [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt 5242880 ] && mv "$LOG" "$LOG.1"
 while :; do
   date -Iseconds >> "$LOG"
-  [ -e "$STATE/stop" ] && break
+  [ -e "$STOP" ] && break
   proot-distro login "$CONTAINER" -- sh -c "cd '$APP' && MALLOC_ARENA_MAX=2 MALLOC_TRIM_THRESHOLD_=131072 exec $START_CMD" >> "$LOG" 2>&1 || true
-  [ -e "$STATE/stop" ] && break
+  [ -e "$STOP" ] && break
   sleep "${WOSLAND_RESTART_DELAY:-15}"
 done
 
