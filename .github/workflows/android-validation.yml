@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run pinned ShellCheck
-        run: docker run --rm -v "$PWD:/mnt" koalaman/shellcheck-alpine:v0.10.0 shellcheck -x /mnt/scripts/*.sh /mnt/tests/*.sh
+        run: docker run --rm -v "$PWD:/mnt" koalaman/shellcheck-alpine:v0.10.0 sh -c 'shellcheck -x /mnt/scripts/*.sh /mnt/tests/*.sh'
 
   posix-tests:
     name: POSIX and simulation tests
