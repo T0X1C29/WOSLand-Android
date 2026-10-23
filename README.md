@@ -122,6 +122,27 @@ watchdog uses a PID-backed lock, a 15-second restart delay, bounded logs, and
 `$HOME/.wosland-python.stop` as its default stop marker. A real Android reboot
 is required before claiming reboot persistence.
 
+## Management commands
+
+Use `scripts/wosland.sh` as the single routine-management entry point:
+
+```sh
+sh scripts/wosland.sh status
+sh scripts/wosland.sh start
+sh scripts/wosland.sh stop
+sh scripts/wosland.sh restart
+sh scripts/wosland.sh logs
+sh scripts/wosland.sh check
+sh scripts/wosland.sh diagnostics
+sh scripts/wosland.sh backup /path/to/backup-directory
+```
+
+Installation refuses to overwrite an existing app. Updates require a reviewed
+upstream commit and backup, so unattended updates are refused. Database restore
+refuses to overwrite existing SQLite files. Uninstall is intentionally manual
+to prevent removal of unrelated Termux data; keep the stop marker present while
+performing maintenance.
+
 ## Backup and restore
 
 Back up the application, virtual environment, `db/`, OCR models, token file, and

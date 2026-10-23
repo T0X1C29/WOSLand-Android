@@ -15,4 +15,6 @@ grep -q 'su -c' "$ROOT/scripts/compatibility-check.sh" && fail 'checker must not
 grep -q 'WOSLAND_APP_DIR' "$ROOT/scripts/install-offline.sh" || fail 'app path must be configurable'
 grep -q 'on_term' "$ROOT/scripts/termux-watchdog.sh" || fail 'watchdog must exit on termination'
 grep -q 'WOSLAND_STOP_MARKER' "$ROOT/scripts/termux-watchdog.sh" || fail 'stop marker must be configurable'
+grep -q 'Refusing to overwrite existing database' "$ROOT/scripts/restore-database.sh" || fail 'restore must refuse overwrite'
+grep -q 'Refusing automatic uninstall' "$ROOT/scripts/wosland.sh" || fail 'management wrapper must refuse destructive uninstall'
 echo 'PASS: shell syntax and safety checks'
