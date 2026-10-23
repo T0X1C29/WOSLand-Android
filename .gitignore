@@ -1,0 +1,15 @@
+.env
+*.token
+bot_token.txt
+*.sqlite
+*.db
+*.sqlite-*
+backups/
+logs/
+wheelhouse/
+.venv/
+__pycache__/
+*.pyc
+private/
+private-backups/
+
